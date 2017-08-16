@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Voice</string>
+    <string name="can_i_help_you">有什么可以帮你？</string>
+    <string name="please_cay_number">请说第几个？</string>
+</resources>

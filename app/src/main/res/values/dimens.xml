@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="hint_bottom_margin">15dp</dimen>
+    <dimen name="voice_text_size">30px</dimen>
+    <dimen name="voice_bottom_margin_top">460dp</dimen>
+    <dimen name="voice_circle_large_size">240dp</dimen>
+    <dimen name="voice_circle_small_size">170dp</dimen>
+    <dimen name="voice_circle_margin_large_top">190dp</dimen>
+    <dimen name="voice_circle_margin_small_top">120dp</dimen>
+    <dimen name="hint_top_margin_top">340dp</dimen>
+</resources>

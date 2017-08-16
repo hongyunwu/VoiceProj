@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/black"
+    android:clipChildren="false"
+    >
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/voice_bg"
+        android:scaleType="matrix"/>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.autoio.voice_view.VoiceView
+            android:layout_width="@dimen/voice_circle_large_size"
+            android:layout_height="@dimen/voice_circle_large_size"
+            android:id="@+id/voice_view"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="@dimen/voice_circle_margin_large_top"
+            app:voice_bg="@drawable/voice"
+            app:voice_circle_color_1="@color/voice_color_1"
+            app:voice_circle_color_2="@color/voice_color_2"
+            app:voice_circle_color_3="@color/voice_color_3"
+            app:voice_circle_shadow_width="12dp"
+            app:voice_search_circle_large_width="18dp"
+            app:voice_search_circle_small_width="8dp"
+            />
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="@dimen/voice_bottom_margin_top"
+            android:id="@+id/ll_hint_bottom">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/voice_diot"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/can_i_help_you"
+                android:textColor="@color/color_white"
+                android:id="@+id/hint_bottom_text"
+                android:textSize="@dimen/voice_text_size"
+                android:layout_marginLeft="@dimen/hint_bottom_margin"
+                android:layout_marginRight="@dimen/hint_bottom_margin"/>
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/voice_diot"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:orientation="vertical"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="@dimen/hint_top_margin_top"
+            android:layout_height="wrap_content">
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:orientation="horizontal">
+                <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/voice_diot"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/please_cay_number"
+                    android:textColor="@color/color_white"
+                    android:textSize="@dimen/voice_text_size"
+                    android:layout_marginLeft="@dimen/hint_bottom_margin"
+                    android:layout_marginRight="@dimen/hint_bottom_margin"/>
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/voice_diot"/>
+
+            </LinearLayout>
+
+            <android.support.v7.widget.RecyclerView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+            </android.support.v7.widget.RecyclerView>
+        </LinearLayout>
+
+
+    </FrameLayout>
+
+
+
+</FrameLayout>
