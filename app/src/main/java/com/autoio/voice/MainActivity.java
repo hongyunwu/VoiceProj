@@ -10,16 +10,20 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.animation.AnticipateOvershootInterpolator;
 import android.view.animation.LinearInterpolator;
+import android.view.animation.OvershootInterpolator;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.autoio.voice_view.VoiceView;
 import com.mobvoi.speech.SpeechClient;
 import com.mobvoi.speech.SpeechClientListener;
 import com.mobvoi.speech.VadType;
+import com.mobvoi.speech.tts.TTSRequest;
 
 import java.util.ArrayList;
 
@@ -27,6 +31,7 @@ import butterknife.BindDimen;
 import butterknife.BindString;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
 public class MainActivity extends AppCompatActivity {
 
     @BindView(R.id.hint_bottom_text_src)
@@ -79,20 +84,23 @@ public class MainActivity extends AppCompatActivity {
     ImageView top_diot_right;
     private SearchResultAdapter searchResultAdapter;
     private boolean isDiotScaled = false;
-
+    @BindView(R.id.shadow)
+    ImageView shadow;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         initSpeechClient();
-
+        initAnimation();
 
 
 
         voice_view.setOnPressedListener(new VoiceView.OnPressedListener() {
             @Override
             public void onVoicePressed() {
+                // 开始Mix的语音搜索
+                SpeechClient.getInstance().startMixRecognizer(sClientName);
                 //按下时,
                 setBottomText(i_am_listening);
                 //hint_bottom_text.setText(i_am_listening);
@@ -102,27 +110,56 @@ public class MainActivity extends AppCompatActivity {
             public void onVoiceUnPressed() {
                 //抬起
                 setBottomText(searching);
+// 开始Mix的语音搜索
+                SpeechClient.getInstance().stopRecognizer(sClientName);
 
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            Thread.sleep(6000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                getSearchResult();
-                            }
-                        });
-                    }
-                }).start();
             }
         });
     }
 
+    /**
+     * 初始动画
+     */
+    private void initAnimation() {
+        hint_bottom_content.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                hint_bottom_content.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                shadow.setAlpha(0f);
+                hint_bottom_text_des.setScaleX(0f);
+                hint_bottom_text_des.setScaleY(0f);
+                hint_bottom_text_des.setAlpha(0f);
+                shadow.animate().alpha(1f).setDuration(3000).setInterpolator(new LinearInterpolator()).setStartDelay(200).start();
+                hint_bottom_text_src.setVisibility(View.GONE);
+                hint_bottom_content.measure(0,0);
+                final int desWidth = hint_bottom_content.getMeasuredWidth();
+                //已知原宽度和目的宽度，差值就是需要做的动画
+                ValueAnimator initLargeAnimator = ValueAnimator.ofInt(0, desWidth);
+                initLargeAnimator.setDuration(1200);//动画时间暂定为1s
+                initLargeAnimator.setRepeatCount(0);
+                initLargeAnimator.setInterpolator(new OvershootInterpolator());
+                initLargeAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(ValueAnimator animation) {
+                        int width = (int) animation.getAnimatedValue();
+                        if (hint_bottom_content.getVisibility()!=View.VISIBLE&&width>=hint_bottom_diot_left.getWidth()){
+                            hint_bottom_content.setVisibility(View.VISIBLE);
+                        }
+
+                        ViewGroup.LayoutParams layoutParams = hint_bottom_content.getLayoutParams();
+                        layoutParams.width = width;
+                        hint_bottom_content.setLayoutParams(layoutParams);
+                    }
+                });
+                initLargeAnimator.start();
+
+                hint_bottom_text_des.animate().alpha(1f).scaleX(1f).scaleY(1f).setInterpolator(new OvershootInterpolator()).setDuration(1200).start();
+            }
+        });
+
+
+
+    }
 
 
     // 非正式Appkey， 仅提供给开发者Demo使用
@@ -157,16 +194,28 @@ public class MainActivity extends AppCompatActivity {
         SpeechClient.getInstance().init(this, sAppKey, true, true);
 
 
+        TTSRequest ttsRequest = new TTSRequest("欢迎使用友衷语音");
+        SpeechClient.getInstance().startTTS(ttsRequest);
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        SpeechClient.getInstance().stopTTS();
     }
 
     private class SpeechClientListenerImpl implements SpeechClientListener {
 
         // 开始提供录音数据给语音识别引擎时回调
         public void onStartRecord() {
+            Log.i(TAG,"onStartRecord->");
         }
 
         // 服务器端检测到静音（说话人停止说话）后回调
         public void onRemoteSilenceDetected() {
+            Log.i(TAG,"onRemoteSilenceDetected->");
         }
 
         // 输入语音数据实时的音量回调，范围为[0, 60]
@@ -175,30 +224,64 @@ public class MainActivity extends AppCompatActivity {
 
         // 语音识别部分结果返回，比如“今天天气怎么样”，会按顺序返回“今天”，“今天天气”，“今天天气怎么样”，前两个就属于Partial Transcription
         public void onPartialTranscription(String fixedContent) {
+            Log.i(TAG,"onPartialTranscription->"+fixedContent);
+
         }
 
         // 语音识别最终结果返回，比如“今天天气怎么样”，会按顺序返回“今天”，“今天天气”，“今天天气怎么样”，最后一个就是Final Transcription
         public void onFinalTranscription(final String result) {
+            Log.i(TAG,"onPartialTranscription->"+result);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    getSearchResult();
+                    Toast.makeText(MainActivity.this,"result:"+result,Toast.LENGTH_SHORT).show();
+                }
+            });
+
         }
 
         // 语音搜索结果返回, 为JSON格式字符串
         public void onResult(final String result) {
+            Log.i(TAG,"onResult->"+result);
         }
 
-        // 错误码返回
+        /**
+         0 	语音服务器错误　
+         1 	网络错误　　　　
+         2 	无网络　　　　　
+         3 	录音设备错误　　
+         4 	识别内容为空　　
+         5 	输入语音过长　　
+         6 	起始静音时间过长
+         7 	网络太慢　　　　
+         * @param errorCode
+         */
         public void onError(final int errorCode) {
+            Log.i(TAG,"onError->"+errorCode);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    getSearchResult();
+                    Toast.makeText(MainActivity.this,"errorCode:"+errorCode,Toast.LENGTH_SHORT).show();
+                }
+            });
+
         }
 
         // 在检测到本地语音之后，又检测到本地静音时回调
         public void onLocalSilenceDetected() {
+            Log.i(TAG,"onLocalSilenceDetected->");
         }
 
         // 一段时间未检测到本地语音时回调
         public void onNoSpeechDetected() {
+            Log.i(TAG,"onNoSpeechDetected->");
         }
 
         // 检测到本地语音时回调
         public void onSpeechDetected() {
+            Log.i(TAG,"onSpeechDetected->");
         }
     }
 
@@ -351,7 +434,6 @@ public class MainActivity extends AppCompatActivity {
                 ViewGroup.LayoutParams layoutParams = hint_top_text_desc.getLayoutParams();
                 layoutParams.width = width;
                 hint_top_text_desc.setLayoutParams(layoutParams);
-                Log.i(TAG,"onAnimationUpdate->"+width);
                 //hint_top_text_desc.requestLayout();
             }
         });
@@ -377,7 +459,6 @@ public class MainActivity extends AppCompatActivity {
                 ViewGroup.LayoutParams layoutParams = recycler_list.getLayoutParams();
                 layoutParams.width = width;
                 recycler_list.setLayoutParams(layoutParams);
-                Log.i(TAG,"onAnimationUpdate->"+width);
                 //hint_top_text_desc.requestLayout();
             }
         });
@@ -472,7 +553,6 @@ public class MainActivity extends AppCompatActivity {
                         hint_bottom_text_des.setScaleY(0f);
                         hint_bottom_text_src.animate().alpha(0f).setDuration(hint_duration/2).start();
                         hint_bottom_text_des.animate().alpha(1f).scaleX(1f).scaleY(1f).setDuration(hint_duration/2).start();
-                        Log.i(TAG,"onAnimationEnd...-animate");
                     }
 
                 }
@@ -500,14 +580,12 @@ public class MainActivity extends AppCompatActivity {
                         public void run() {
                             if (srcWidth>desWidth){
                                 widthAnimator.start();
-                                Log.i(TAG,"withEndAction widthAnimator.start()");
                             }
                         }
                     });
                 }
             }).start();
 
-            Log.i(TAG,"hint_bottom_text_des.animate");
         }
 
 

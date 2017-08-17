@@ -14,7 +14,6 @@ import android.graphics.RadialGradient;
 import android.graphics.Shader;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
@@ -158,7 +157,6 @@ public class VoiceView extends View {
         super.onDraw(canvas);
         mDefaultRadius = measuredWidth * 2 / 3 / 2;
 
-        Log.i(TAG,"onDraw->shift:"+shift);
         drawVoiceCircle(canvas);
         drawThreeCircle(canvas, shift,mDefaultRadius+shift/2,mDefaultRadius+shift/2,mDefaultRadius+shift/2);
         drawEightCircle(canvas);
@@ -217,7 +215,6 @@ public class VoiceView extends View {
                     (float) (measuredWidth/2 + Math.cos(mDegree+Math.PI*7/4)*(mDefaultRadius*((mDefaultRadius+shift/2-mPreSearchRadius)/(mDefaultRadius +shift/2- search_lessen_size)))),
                     (float) (measuredHeight/2 + Math.sin(mDegree+Math.PI*7/4)*(mDefaultRadius*((mDefaultRadius+shift/2-mPreSearchRadius)/(mDefaultRadius +shift/2- search_lessen_size)))),
                     mPreSearchRadius,mDefaultPaint);
-            Log.i(TAG,"drawFourCircle->shift"+shift);
             mDefaultPaint.setShader(null);
         }else if (current_state == END_SEARCH_STATE){
             //需要一個渐显的圆和三个逐渐缩小的圆
@@ -267,7 +264,6 @@ public class VoiceView extends View {
                     (float) (measuredWidth/2 + Math.cos(mSearchDegree+Math.PI*7/4)*(mDefaultRadius*((mDefaultRadius+shift/2-end_search_scale_size_1)/(mDefaultRadius +shift/2- search_lessen_size)))),
                     (float) (measuredHeight/2 + Math.sin(mSearchDegree+Math.PI*7/4)*(mDefaultRadius*((mDefaultRadius+shift/2-end_search_scale_size_1)/(mDefaultRadius +shift/2- search_lessen_size)))),
                     end_search_scale_size_1,mDefaultPaint);
-            Log.i(TAG,"drawFourCircle->shift"+shift);
             mDefaultPaint.setShader(null);
 
 
@@ -365,7 +361,6 @@ public class VoiceView extends View {
                     , search_scale_size_2
                     ,mDefaultPaint);
             mDefaultPaint.setShader(null);
-            Log.i(TAG,"drawEightCircle->mSearchDegree:"+mSearchDegree);
         }
 
     }
@@ -410,7 +405,6 @@ public class VoiceView extends View {
             }else if(current_state == END_SEARCH_STATE){
                 mDefaultPaint.setAlpha((int) ((end_search_scale_size_1 - search_scale_size_1)/(mDefaultRadius+initShiftValue/2 - search_scale_size_1)*255));
 
-                Log.i(TAG,"drawaVoiceCircle->alpha:"+(end_search_scale_size_1 - search_scale_size_1)/(mDefaultRadius+initShiftValue/2 - search_scale_size_1)+",end_search_scale_size_1:"+end_search_scale_size_1);
             }else {
                 mDefaultPaint.setAlpha(255);
             }
@@ -434,14 +428,12 @@ public class VoiceView extends View {
 
             mDefaultPaint.setColor(getThreeColor(2));
             canvas.drawCircle((float) (measuredWidth/2 + Math.cos(mDegree+Math.PI*11/6)*shift/2),(float)( measuredHeight/2 + Math.sin(mDegree+Math.PI*11/6)*shift/2), initialLessenRadius,mDefaultPaint);
-            Log.i(TAG,"drawVoiceCircle->larger:"+initialLargerRadius+",lessen:"+initialLessenRadius+",default:"+mDefaultRadius);
 
         }
         if (current_state==PRE_SEARCH_STATE){
             //(lar+shift/2-mPreSearchRadius)/(mDefaultRadius +shift/2- search_lessen_size)
             mDefaultPaint.setColor(Color.WHITE);
             mDefaultPaint.setAlpha((int) (Math.sqrt((mPreSearchRadius - search_lessen_size)/(mDefaultRadius +shift/2- search_lessen_size))*255));
-            Log.i(TAG,"mDefaultRadius:"+mDefaultRadius+",shift:"+shift+",voice_shadow_width:"+voice_shadow_width+",mPreSearchRadius:"+mPreSearchRadius+",search_lessen_size:"+search_lessen_size);
             RadialGradient radialGradient = new RadialGradient(measuredWidth / 2
                     , measuredHeight / 2,(mDefaultRadius- shift/10+voice_shadow_width)*(mPreSearchRadius - search_lessen_size)/(mDefaultRadius +shift/2- search_lessen_size)
                     ,new int[]{Color.WHITE
@@ -459,7 +451,6 @@ public class VoiceView extends View {
             mDefaultPaint.setAlpha((int) (Math.sqrt((mPreSearchRadius - search_lessen_size)/(mDefaultRadius +shift/2- search_lessen_size))*255));
             mDefaultPaint.setColor(Color.rgb(0,0x00,0xff));
             canvas.drawCircle(measuredWidth/2,measuredHeight/2, (mDefaultRadius - shift/10)*(mPreSearchRadius - search_lessen_size)/(mDefaultRadius +shift/2- search_lessen_size),mDefaultPaint);
-            Log.i(TAG,"drawVoiceCircle->：mPreSearchRadius"+(mPreSearchRadius - search_lessen_size)/(mDefaultRadius +shift/2- search_lessen_size));
             mDefaultPaint.setAlpha(255);
         }
 
@@ -526,8 +517,6 @@ public class VoiceView extends View {
 
             mDefaultPaint.setColor(getThreeColor(2));
             canvas.drawCircle((float) (measuredWidth/2 + Math.cos(mDegree+Math.PI*11/6)*shift/2),(float)( measuredHeight/2 + Math.sin(mDegree+Math.PI*11/6)*shift/2),circle_3_radius,mDefaultPaint);
-            Log.i(TAG,"drawThreeCircle-shift:"+shift);
-            Log.i(TAG,"drawThreeCircle->mDegree:"+mDegree+",1.w:"+Math.cos(mDegree+Math.PI/2)*shift/2+",h:"+Math.sin(mDegree+Math.PI/2)*shift/2);
         }
 
 
@@ -597,7 +586,6 @@ public class VoiceView extends View {
                     public void onAnimationUpdate(ValueAnimator animation) {
 
                         mDegree = (float) animation.getAnimatedValue()%360;
-                        Log.i(TAG,"computeScroll->mDegree:"+mDegree);
                     }
                 });
                 rotateAnimator.start();
@@ -626,7 +614,6 @@ public class VoiceView extends View {
 
         if (current_state==INITIAL_STATE){
             if (lessenAnimator==null&&mDefaultRadius!=0){
-                Log.i(TAG,"computeScroll->default:"+mDefaultRadius+",mDefaultRadius +(measuredWidth * 1 / 3 / 2:"+(mDefaultRadius +(measuredWidth * 1 / 3 / 2)));
                 lessenAnimator = ValueAnimator.ofFloat(mDefaultRadius +(measuredWidth * 1 / 3 / 2)/2 ,mDefaultRadius*3/4,mDefaultRadius +(measuredWidth * 1 / 3 / 2)/2,mDefaultRadius + initShiftValue/2 );
                 lessenAnimator.setDuration(initial_duration);
                 lessenAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -703,7 +690,6 @@ public class VoiceView extends View {
             }
 
 
-            Log.i(TAG,"initial_radius->"+initial_radius);
 
         }else if (current_state==NORMAL_STATE){
             if (normal_animator ==null){
@@ -716,7 +702,6 @@ public class VoiceView extends View {
                     @Override
                     public void onAnimationUpdate(ValueAnimator animation) {
                         shift = (float) animation.getAnimatedValue();
-                        Log.i(TAG,"shift->"+shift);
 
                     }
                 });
@@ -810,7 +795,6 @@ public class VoiceView extends View {
             //
             if (preSearchAnimator==null&&mDefaultRadius!=0){
 
-                Log.i(TAG,"computeScroll->"+mDefaultRadius);
                 preSearchAnimator = ValueAnimator.ofFloat(mDefaultRadius + shift / 2, search_lessen_size);
                 preSearchAnimator.setDuration(pre_search_duration);
                 preSearchAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -871,7 +855,6 @@ public class VoiceView extends View {
                 });
                 endSearchScaleAnimator1.setDuration(normal_duration/2);
                 //(end_search_scale_size_1 - search_scale_size_1)/(mDefaultRadius+initShiftValue/2 - search_scale_size_1)
-                Log.i(TAG,"computscroll----:"+mDefaultRadius+initShiftValue/2+", search_scale_size_1:"+search_scale_size_1);
                 endSearchScaleAnimator2 = ValueAnimator.ofFloat(search_scale_size_1,mDefaultRadius+initShiftValue/2);
                 endSearchScaleAnimator2.setDuration(end_search_duration);
                 endSearchScaleAnimator2.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -936,7 +919,6 @@ public class VoiceView extends View {
                 size = defaultSize;
                 break;
         }
-        Log.i(TAG,"measureMode->"+mode+",size:"+size+",specSize:"+specSize);
 
         return size;
     }

@@ -47,6 +47,7 @@
                 android:id="@+id/hint_bottom_content"
                 android:layout_marginLeft="@dimen/hint_bottom_margin"
                 android:clipChildren="false"
+                android:visibility="gone"
                 android:layout_marginRight="@dimen/hint_bottom_margin">
                 <TextView
                     android:layout_width="wrap_content"
@@ -138,12 +139,19 @@
                 android:layout_height="match_parent"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginBottom="@dimen/recycler_margin_bottom"
+                android:overScrollMode="never"
                 android:id="@+id/recycler_list">
 
             </android.support.v7.widget.RecyclerView>
         </LinearLayout>
 
-
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/shadow"
+            android:layout_marginTop="@dimen/shadow_margin_top"
+            android:id="@+id/shadow"
+            android:layout_gravity="center_horizontal"/>
     </FrameLayout>
 
 
