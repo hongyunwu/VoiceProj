@@ -15,6 +15,7 @@
 
     <FrameLayout
         android:layout_width="match_parent"
+        android:clipChildren="false"
         android:layout_height="match_parent">
 
         <com.autoio.voice_view.VoiceView
@@ -31,66 +32,113 @@
             app:voice_search_circle_large_width="18dp"
             app:voice_search_circle_small_width="8dp"
             />
-        <LinearLayout
-            android:layout_width="wrap_content"
+        <RelativeLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:gravity="center_vertical"
             android:layout_marginTop="@dimen/voice_bottom_margin_top"
-            android:id="@+id/ll_hint_bottom">
+            android:clipChildren="false"
+            android:id="@+id/rl_hint_bottom">
 
-            <ImageView
+
+            <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/voice_diot"/>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/can_i_help_you"
-                android:textColor="@color/color_white"
-                android:id="@+id/hint_bottom_text"
-                android:textSize="@dimen/voice_text_size"
+                android:layout_centerInParent="true"
+                android:id="@+id/hint_bottom_content"
                 android:layout_marginLeft="@dimen/hint_bottom_margin"
-                android:layout_marginRight="@dimen/hint_bottom_margin"/>
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/voice_diot"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:orientation="vertical"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="@dimen/hint_top_margin_top"
-            android:layout_height="wrap_content">
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                android:orientation="horizontal">
-                <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/voice_diot"/>
+                android:clipChildren="false"
+                android:layout_marginRight="@dimen/hint_bottom_margin">
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/please_cay_number"
+                    android:text="@string/can_i_help_you"
+                    android:textColor="@color/color_white"
+                    android:singleLine="true"
+                    android:id="@+id/hint_bottom_text_src"
+                    android:textSize="@dimen/voice_text_size"
+                    android:layout_centerInParent="true"
+                    />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/can_i_help_you"
+                    android:textColor="@color/color_white"
+                    android:id="@+id/hint_bottom_text_des"
+                    android:singleLine="true"
+                    android:textSize="@dimen/voice_text_size"
+                    android:layout_centerInParent="true"
+                    />
+            </RelativeLayout>
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:id="@+id/hint_bottom_diot_left"
+                android:layout_toLeftOf="@id/hint_bottom_content"
+                android:background="@drawable/voice_diot"/>
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:id="@+id/hint_bottom_diot_right"
+                android:layout_toRightOf="@id/hint_bottom_content"
+                android:background="@drawable/voice_diot"/>
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:orientation="vertical"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="@dimen/hint_top_margin_top"
+            android:layout_height="match_parent">
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:clipChildren="false"
+                android:layout_gravity="center_horizontal"
+                android:id="@+id/rl_hint_top"
+                android:visibility="invisible"
+                >
+               <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/you_can_try_map_nai"
                     android:textColor="@color/color_white"
                     android:textSize="@dimen/voice_text_size"
+                    android:maxLines="1"
+
+                    android:visibility="gone"
+                    android:layout_centerInParent="true"
+                    android:id="@+id/hint_top_text_desc"
                     android:layout_marginLeft="@dimen/hint_bottom_margin"
                     android:layout_marginRight="@dimen/hint_bottom_margin"/>
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:id="@+id/top_diot_left"
+                    android:layout_centerInParent="true"
+                    android:layout_toLeftOf="@id/hint_top_text_desc"
+                    android:background="@drawable/voice_diot"/>
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:id="@+id/top_diot_right"
+                    android:layout_centerInParent="true"
+                    android:layout_toRightOf="@id/hint_top_text_desc"
                     android:background="@drawable/voice_diot"/>
 
-            </LinearLayout>
+
+            </RelativeLayout>
 
             <android.support.v7.widget.RecyclerView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="@dimen/recycler_margin_bottom"
+                android:id="@+id/recycler_list">
 
             </android.support.v7.widget.RecyclerView>
         </LinearLayout>

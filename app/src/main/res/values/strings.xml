@@ -2,4 +2,7 @@
     <string name="app_name">Voice</string>
     <string name="can_i_help_you">有什么可以帮你？</string>
     <string name="please_cay_number">请说第几个？</string>
+    <string name="i_am_listening">我在听呢</string>
+    <string name="searching">正在搜索</string>
+    <string name="you_can_try_map_nai">可以试试 \"地图\"  \"导航\"</string>
 </resources>
