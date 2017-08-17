@@ -843,6 +843,10 @@ public class VoiceView extends View {
                 rotateSearchAnimator.cancel();
                 rotateSearchAnimator = null;
             }
+            if (preSearchAnimator!=null&&preSearchAnimator.isRunning()){
+                preSearchAnimator.cancel();
+                preSearchAnimator = null;
+            }
 
             if (endSearchScaleAnimator1==null&&mDefaultRadius!=0){
                 //四个小圆变小search_scale_size2
