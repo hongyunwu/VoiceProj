@@ -2,6 +2,7 @@ package com.autoio.voice;
 
 import android.animation.Animator;
 import android.animation.ValueAnimator;
+import android.annotation.TargetApi;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -16,6 +17,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.autoio.voice_view.VoiceView;
+import com.mobvoi.speech.SpeechClient;
+import com.mobvoi.speech.SpeechClientListener;
+import com.mobvoi.speech.VadType;
 
 import java.util.ArrayList;
 
@@ -23,7 +27,6 @@ import butterknife.BindDimen;
 import butterknife.BindString;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-
 public class MainActivity extends AppCompatActivity {
 
     @BindView(R.id.hint_bottom_text_src)
@@ -82,43 +85,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+        initSpeechClient();
 
 
-        /*new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(5000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        voiceView.changeState(VoiceView.PRE_SEARCH_STATE);
-                    }
-                });
 
-            }
-        }).start();
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(11000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        voiceView.changeState(VoiceView.END_SEARCH_STATE);
-                    }
-                });
-
-            }
-        }).start();*/
         voice_view.setOnPressedListener(new VoiceView.OnPressedListener() {
             @Override
             public void onVoicePressed() {
@@ -152,6 +123,86 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+
+
+    // 非正式Appkey， 仅提供给开发者Demo使用
+    private static final String sAppKey = "com.mobvoi.test";
+    // 仅用作统计，请全局使用唯一字符串
+    private static final String sClientName = "autoio_voice";
+    // 联系人列表，供离线识别使用，语义为“打电话给王斌”，“给熊伟打电话”，“发短信给邓凯”等
+    private static final String[] sContacts = {"邓凯", "王斌", "熊伟"};
+    // 应用列表，供离线识别使用，语义为“打开支付宝”，“关闭支付宝”等
+    private static final String[] sApps = {"导航", "音乐", "收音机","电话"};
+    // 命令词列表，供离线识别使用，语义为“关机”，“重启”等
+    private static final String[] sVoiceCommands = {"关机", "重启", "飞行模式"};
+    // 位置信息，格式为 “国家，省，市，区，街道，门牌号，纬度，经度”
+    private static final String sLocation = "中国,北京市,北京市,海淀区,苏州街,3号,39.989602,116.316568";
+    /**
+     * 进行出门问问初始化
+     */
+    private void initSpeechClient() {
+        // 设置应用名称列表
+        SpeechClient.getInstance().setApps(sApps);
+        // 设置联系人列表
+        SpeechClient.getInstance().setContacts(sContacts);
+        // 设置语音命令词
+        SpeechClient.getInstance().setVoiceAction(sVoiceCommands);
+        // 设置VAD（静音检测）参数
+        SpeechClient.getInstance().setLocalVadParams(sClientName, VadType.DNNBasedVad, 50, 500);
+        // 设置位置信息，最好在每次搜索前设置以提高搜索准确度
+        //SpeechClient.getInstance().setLocationString(deviceName, sLocation);
+        // 设置回调函数，具体后面有介绍
+        SpeechClient.getInstance().setClientListener(sClientName, new SpeechClientListenerImpl());
+        // 初始化，后两个参数分别为：是否激活在线识别，是否激活离线识别
+        SpeechClient.getInstance().init(this, sAppKey, true, true);
+
+
+    }
+
+    private class SpeechClientListenerImpl implements SpeechClientListener {
+
+        // 开始提供录音数据给语音识别引擎时回调
+        public void onStartRecord() {
+        }
+
+        // 服务器端检测到静音（说话人停止说话）后回调
+        public void onRemoteSilenceDetected() {
+        }
+
+        // 输入语音数据实时的音量回调，范围为[0, 60]
+        public void onVolume(double volume) {
+        }
+
+        // 语音识别部分结果返回，比如“今天天气怎么样”，会按顺序返回“今天”，“今天天气”，“今天天气怎么样”，前两个就属于Partial Transcription
+        public void onPartialTranscription(String fixedContent) {
+        }
+
+        // 语音识别最终结果返回，比如“今天天气怎么样”，会按顺序返回“今天”，“今天天气”，“今天天气怎么样”，最后一个就是Final Transcription
+        public void onFinalTranscription(final String result) {
+        }
+
+        // 语音搜索结果返回, 为JSON格式字符串
+        public void onResult(final String result) {
+        }
+
+        // 错误码返回
+        public void onError(final int errorCode) {
+        }
+
+        // 在检测到本地语音之后，又检测到本地静音时回调
+        public void onLocalSilenceDetected() {
+        }
+
+        // 一段时间未检测到本地语音时回调
+        public void onNoSpeechDetected() {
+        }
+
+        // 检测到本地语音时回调
+        public void onSpeechDetected() {
+        }
+    }
+
+    /*****************************************************************/
     private void getSearchResult() {
         voice_view.changeState(VoiceView.END_SEARCH_STATE);
         //第一次改变状态是需要做动画
@@ -197,7 +248,6 @@ public class MainActivity extends AppCompatActivity {
         }).start();
 
     }
-
     private  synchronized void doDiotScale() {
         if (!isDiotScaled){
             //在放大
@@ -269,8 +319,6 @@ public class MainActivity extends AppCompatActivity {
                         rl_hint_top.setVisibility(View.VISIBLE);
                         rl_hint_bottom.setVisibility(View.INVISIBLE);
                         diotAnimate2Large();
-
-
                     }
                 });
 
@@ -278,7 +326,6 @@ public class MainActivity extends AppCompatActivity {
         }).start();
 
     }
-
     private void diotAnimate2Large() {
 
         updateText();
@@ -345,6 +392,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * 重新设置文字内容
      */
+    @TargetApi(19)
     private void updateText() {
         if (searchResultAdapter==null){
             recycler_list.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false));
@@ -370,6 +418,7 @@ public class MainActivity extends AppCompatActivity {
      *
      * @param desText 文字
      */
+    @TargetApi(19)
     private void setBottomText(String desText) {
 
         String srcText = hint_bottom_text_des.getText().toString();

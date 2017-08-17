@@ -107,7 +107,7 @@ public class VoiceView extends View {
     private float mSearchDegree;
     private ValueAnimator rotateSearchAnimator;
     private ValueAnimator preSearchAnimator;
-    private long pre_search_duration = 1000,end_search_duration = 1000;
+    private long pre_search_duration = 2000,end_search_duration = 2000;
     private float mPreSearchRadius;
     private ValueAnimator voiceAlphaAnimator;
     private int voiceAlpha;
