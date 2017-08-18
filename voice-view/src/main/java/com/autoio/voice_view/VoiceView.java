@@ -15,6 +15,7 @@ import android.graphics.Shader;
 import android.graphics.drawable.Drawable;
 import android.os.SystemClock;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
@@ -380,13 +381,12 @@ public class VoiceView extends View {
         if (current_state == PRESSED_STATE||current_state==INITIAL_STATE||current_state==NORMAL_STATE||current_state == END_SEARCH_STATE){
             mDefaultPaint.setColor(Color.WHITE);
             RadialGradient radialGradient = new RadialGradient(measuredWidth / 2
-                    , measuredHeight / 2,mDefaultRadius-shift/10+voice_shadow_width
+                    , measuredHeight / 2,mDefaultRadius-shift/10+voice_shadow_width+(isPressed()?voice_shadow_width/3:0)
                     ,new int[]{Color.WHITE
                     ,Color.WHITE
                     ,Color.WHITE
                     ,Color.WHITE
                     ,Color.WHITE
-
                     ,Color.WHITE
                     ,Color.WHITE,Color.TRANSPARENT}
                     ,null, Shader.TileMode.CLAMP);
@@ -467,6 +467,9 @@ public class VoiceView extends View {
             mDefaultPaint.setAlpha(255);
         }
 
+        if (isPressed()){
+            //画阴影
+        }
         canvas.drawBitmap(drawableToBitmap(voiceDrawable),measuredWidth/2 - voiceDrawable.getIntrinsicWidth()/2,measuredHeight/2 - voiceDrawable.getIntrinsicHeight()/2,mDefaultPaint);
         mDefaultPaint.setAlpha(255);
     }
@@ -735,6 +738,12 @@ public class VoiceView extends View {
             }
 
         } else if (current_state==SEARCH_STATE){
+
+           /* if (preSearchAnimator!=null&& preSearchAnimator.isRunning()){
+                preSearchAnimator.cancel();
+                preSearchAnimator = null;
+            }*/
+
             if (searchScaleAnimator1 ==null){
                 searchScaleAnimator1 = ValueAnimator.ofFloat(search_lessen_size, search_larger_size,search_lessen_size);
                 searchScaleAnimator1.setDuration(normal_duration*2);
@@ -831,7 +840,7 @@ public class VoiceView extends View {
                 preSearchAnimator.start();
             }
 
-        }else if(current_state == END_SEARCH_STATE){//查询结束
+        }else if(current_state == END_SEARCH_STATE){//查询结束,如果查询结束时当前还在
             //需要先暂停search_state的状态
             if (searchScaleAnimator1!=null&&searchScaleAnimator1.isRunning()){
                 searchScaleAnimator1.cancel();
@@ -847,6 +856,7 @@ public class VoiceView extends View {
             }
             /*if (preSearchAnimator!=null&&preSearchAnimator.isRunning()){
                 preSearchAnimator.cancel();
+                preSearchAnimator = null;
             }*/
 
             if (endSearchScaleAnimator1==null&&mDefaultRadius!=0){
@@ -953,7 +963,7 @@ public class VoiceView extends View {
                 if (onPressedListener!=null){
                     onPressedListener.onVoiceUp();
                 }
-                if (SystemClock.uptimeMillis() - downTime>=2*1000){//大于两秒就发起搜索
+                if (SystemClock.uptimeMillis() - downTime>=1*1000){//大于一秒就发起搜索
                     if (onPressedListener!=null){
                         //开始搜索//此时应该停止
                         onPressedListener.onVoiceSearch();
@@ -984,8 +994,27 @@ public class VoiceView extends View {
      * 改变当前的状态
      * @param state
      */
-    public void changeState(int state){
-        current_state = state;
+    public void changeState(final int state){
+        Log.i(TAG,"current_state:"+current_state);
+
+        if (state==END_SEARCH_STATE){
+            //需要看当前是否出于searchstate，如不处于，则应延时处理state
+
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    //子线程
+                    while (current_state==PRE_SEARCH_STATE){
+
+
+                    }
+                    current_state = state;
+                    Log.i(TAG,"changeState->current_state:"+current_state);
+                }
+            }).start();
+
+
+        }
 
     }
 

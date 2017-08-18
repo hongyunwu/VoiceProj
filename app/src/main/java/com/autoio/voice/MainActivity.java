@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.ValueAnimator;
 import android.annotation.TargetApi;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -86,6 +87,8 @@ public class MainActivity extends AppCompatActivity {
     private boolean isDiotScaled = false;
     @BindView(R.id.shadow)
     ImageView shadow;
+    private long searchTime;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -126,6 +129,8 @@ public class MainActivity extends AppCompatActivity {
                 setBottomText(searching);
                 // 结束Mix的语音搜索
                 SpeechClient.getInstance().stopRecognizer(sClientName);
+                //开始进行搜索.
+                searchTime = SystemClock.uptimeMillis();//
             }
         });
     }
@@ -243,6 +248,7 @@ public class MainActivity extends AppCompatActivity {
         // 语音识别最终结果返回，比如“今天天气怎么样”，会按顺序返回“今天”，“今天天气”，“今天天气怎么样”，最后一个就是Final Transcription
         public void onFinalTranscription(final String result) {
             Log.i(TAG,"onPartialTranscription->"+result);
+
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -270,6 +276,8 @@ public class MainActivity extends AppCompatActivity {
          * @param errorCode
          */
         public void onError(final int errorCode) {
+
+            //出现错误时
             Log.i(TAG,"onError->"+errorCode);
             runOnUiThread(new Runnable() {
                 @Override
@@ -299,6 +307,7 @@ public class MainActivity extends AppCompatActivity {
 
     /*****************************************************************/
     private void getSearchResult() {
+
         voice_view.changeState(VoiceView.END_SEARCH_STATE);
         //第一次改变状态是需要做动画
         if(needAnimateTop){
