@@ -97,8 +97,9 @@ public class MainActivity extends AppCompatActivity {
 
 
         voice_view.setOnPressedListener(new VoiceView.OnPressedListener() {
+
             @Override
-            public void onVoicePressed() {
+            public void onVoiceDown() {
                 // 开始Mix的语音搜索
                 SpeechClient.getInstance().startMixRecognizer(sClientName);
                 //按下时,
@@ -107,12 +108,24 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onVoiceUnPressed() {
+            public void onVoiceCancel() {
+                SpeechClient.getInstance().cancelReconizer(sClientName);
+                setBottomText(can_i_help_you);
+                //时间太短
+            }
+
+            //此方法可以不用
+            @Override
+            public void onVoiceUp() {
+
+            }
+
+            @Override
+            public void onVoiceSearch() {
                 //抬起
                 setBottomText(searching);
-// 开始Mix的语音搜索
+                // 结束Mix的语音搜索
                 SpeechClient.getInstance().stopRecognizer(sClientName);
-
             }
         });
     }
@@ -192,7 +205,6 @@ public class MainActivity extends AppCompatActivity {
         SpeechClient.getInstance().setClientListener(sClientName, new SpeechClientListenerImpl());
         // 初始化，后两个参数分别为：是否激活在线识别，是否激活离线识别
         SpeechClient.getInstance().init(this, sAppKey, true, true);
-
 
         TTSRequest ttsRequest = new TTSRequest("欢迎使用友衷语音");
         SpeechClient.getInstance().startTTS(ttsRequest);

@@ -13,6 +13,7 @@ import android.graphics.PixelFormat;
 import android.graphics.RadialGradient;
 import android.graphics.Shader;
 import android.graphics.drawable.Drawable;
+import android.os.SystemClock;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -116,6 +117,7 @@ public class VoiceView extends View {
     private float end_search_scale_size_2;
     private ValueAnimator endSearchScaleAnimator2;
     private float end_search_scale_size_1;
+    private long downTime;
 
 
     public VoiceView(Context context) {
@@ -897,7 +899,6 @@ public class VoiceView extends View {
         super.computeScroll();
         postInvalidate();
 
-
     }
 
 
@@ -939,8 +940,9 @@ public class VoiceView extends View {
         switch (event.getAction()){
             case MotionEvent.ACTION_DOWN:
                 if (onPressedListener!=null&&isClickable()){
-                    onPressedListener.onVoicePressed();
+                    onPressedListener.onVoiceDown();
                 }
+                downTime = SystemClock.uptimeMillis();
                 break;
             case MotionEvent.ACTION_MOVE:
                 current_state = PRESSED_STATE;
@@ -949,12 +951,26 @@ public class VoiceView extends View {
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
                 if (onPressedListener!=null){
-                    onPressedListener.onVoiceUnPressed();
+                    onPressedListener.onVoiceUp();
                 }
-                preSearchAnimator = null;
-                endSearchScaleAnimator1 =null;
-                endSearchScaleAnimator2 = null;
-                current_state = PRE_SEARCH_STATE;
+                if (SystemClock.uptimeMillis() - downTime>=2*1000){//大于两秒就发起搜索
+                    if (onPressedListener!=null){
+                        //开始搜索//此时应该停止
+                        onPressedListener.onVoiceSearch();
+                    }
+
+                    preSearchAnimator = null;
+                    endSearchScaleAnimator1 =null;
+                    endSearchScaleAnimator2 = null;
+                    current_state = PRE_SEARCH_STATE;
+                }else {
+                    if (onPressedListener!=null){
+                        //开始搜索//此时应该停止
+                        onPressedListener.onVoiceCancel();
+                        current_state = NORMAL_STATE;
+                    }
+                }
+
                 setPressed(false);
 
                 break;
@@ -980,8 +996,10 @@ public class VoiceView extends View {
 
     private OnPressedListener onPressedListener;
     public interface OnPressedListener{
-        void onVoicePressed();
-        void onVoiceUnPressed();
+        void onVoiceDown();
+        void onVoiceCancel();
+        void onVoiceUp();
+        void onVoiceSearch();
     }
 
 }
